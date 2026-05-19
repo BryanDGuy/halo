@@ -36,6 +36,7 @@ func New(tile *grid.Tile, alpha, dt, h float64) *Worker {
 func (w *Worker) Start() chan<- struct{} { return w.startCh }
 
 // CurrentTile returns the tile holding the latest computed state.
+// Only safe to call after the WaitGroup passed to Run has been waited on for the current step.
 func (w *Worker) CurrentTile() *grid.Tile { return w.cur }
 
 // SetSendN / SetRecvN etc. are called by Sim during wiring.
