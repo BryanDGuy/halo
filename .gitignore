@@ -1,0 +1,25 @@
+# Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+/halo
+/bin/
+
+# Test/coverage
+*.out
+*.test
+
+# Go workspace
+go.work
+go.work.sum
+
+# Editor/OS
+.DS_Store
+.idea/
+.vscode/
+
+# Claude / scaffold
+.claude/settings.local.json
+docs/superpowers/plans/*
+.superpowers/
