@@ -141,3 +141,39 @@ func TestStepIntoUsesWestGhost(t *testing.T) {
 		t.Errorf("want 1.0, got %v", got)
 	}
 }
+
+func TestStepIntoUsesSouthGhost(t *testing.T) {
+	// alpha=1, dt=0.1, h=1 → r=0.1
+	// center=0, south ghost=10, all others=0
+	// new center = 0 + 0.1*(0+10+0+0 - 4*0) = 1.0
+	g := grid.New(1, 1)
+	tiles := grid.Decompose(g, 1)
+	tile := tiles[0][0]
+	tile.SetSouthGhost([]float64{10.0})
+
+	nxt := grid.NewTile(0, 0, 1, 1)
+	tile.StepInto(nxt, 1.0, 0.1, 1.0)
+
+	got := nxt.InteriorAt(0, 0)
+	if math.Abs(got-1.0) > 1e-14 {
+		t.Errorf("want 1.0, got %v", got)
+	}
+}
+
+func TestStepIntoUsesEastGhost(t *testing.T) {
+	// alpha=1, dt=0.1, h=1 → r=0.1
+	// center=0, east ghost=10, all others=0
+	// new center = 0 + 0.1*(0+0+0+10 - 4*0) = 1.0
+	g := grid.New(1, 1)
+	tiles := grid.Decompose(g, 1)
+	tile := tiles[0][0]
+	tile.SetEastGhost([]float64{10.0})
+
+	nxt := grid.NewTile(0, 0, 1, 1)
+	tile.StepInto(nxt, 1.0, 0.1, 1.0)
+
+	got := nxt.InteriorAt(0, 0)
+	if math.Abs(got-1.0) > 1e-14 {
+		t.Errorf("want 1.0, got %v", got)
+	}
+}
