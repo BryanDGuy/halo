@@ -100,3 +100,44 @@ func TestStepIntoUsesGhost(t *testing.T) {
 		t.Errorf("want 1.0, got %v", got)
 	}
 }
+
+func TestEastWestBoundaries(t *testing.T) {
+	g := grid.New(4, 4)
+	for r := 0; r < 4; r++ {
+		for c := 0; c < 4; c++ {
+			g.Set(r, c, float64(r*4+c))
+		}
+	}
+	tiles := grid.Decompose(g, 2)
+	t00 := tiles[0][0] // interior rows 0-1, cols 0-1 of full grid
+
+	// WestBoundary = leftmost interior col = grid col 0 = [0, 4]
+	wb := t00.WestBoundary()
+	if wb[0] != 0 || wb[1] != 4 {
+		t.Errorf("WestBoundary: want [0 4], got %v", wb)
+	}
+	// EastBoundary = rightmost interior col = grid col 1 = [1, 5]
+	eb := t00.EastBoundary()
+	if eb[0] != 1 || eb[1] != 5 {
+		t.Errorf("EastBoundary: want [1 5], got %v", eb)
+	}
+}
+
+func TestStepIntoUsesWestGhost(t *testing.T) {
+	// 1x1 interior tile; inject west ghost and verify stencil uses it.
+	// alpha=1, dt=0.1, h=1 → r=0.1
+	// center=0, west ghost=10, all others=0
+	// new center = 0 + 0.1*(0+0+10+0 - 4*0) = 1.0
+	g := grid.New(1, 1)
+	tiles := grid.Decompose(g, 1)
+	tile := tiles[0][0]
+	tile.SetWestGhost([]float64{10.0})
+
+	nxt := grid.NewTile(0, 0, 1, 1)
+	tile.StepInto(nxt, 1.0, 0.1, 1.0)
+
+	got := nxt.InteriorAt(0, 0)
+	if math.Abs(got-1.0) > 1e-14 {
+		t.Errorf("want 1.0, got %v", got)
+	}
+}
