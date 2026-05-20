@@ -37,6 +37,9 @@ func TestFrameCharacters(t *testing.T) {
 	if runes[0] != ' ' {
 		t.Errorf("0.0 should render as space, got %q", runes[0])
 	}
+	if runes[1] != '▒' {
+		t.Errorf("0.5 should render as ▒, got %q", runes[1])
+	}
 	if runes[2] != '█' {
 		t.Errorf("1.0 should render as █, got %q", runes[2])
 	}
