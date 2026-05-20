@@ -11,23 +11,30 @@ import (
 
 var gradient = []rune{' ', '░', '▒', '▓', '█'}
 
-func toChar(v float64) rune {
-	if v <= 0 {
+func toChar(v, scale float64) rune {
+	if scale <= 0 || v <= 0 {
 		return gradient[0]
 	}
-	if v >= 1 {
+	norm := v / scale
+	if norm >= 1 {
 		return gradient[len(gradient)-1]
 	}
-	idx := int(v * float64(len(gradient)-1))
+	idx := int(norm * float64(len(gradient)-1))
 	return gradient[idx]
 }
 
-// FrameTo writes the heatmap to w (used for testing).
+// FrameTo writes the heatmap to w, normalizing to the grid's current max value.
 func FrameTo(w io.Writer, g *grid.Grid) {
+	var peak float64
+	for _, v := range g.Data {
+		if v > peak {
+			peak = v
+		}
+	}
 	var sb strings.Builder
 	for r := 0; r < g.Rows; r++ {
 		for c := 0; c < g.Cols; c++ {
-			sb.WriteRune(toChar(g.At(r, c)))
+			sb.WriteRune(toChar(g.At(r, c), peak))
 		}
 		sb.WriteByte('\n')
 	}
