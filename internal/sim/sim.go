@@ -84,37 +84,30 @@ func (s *Sim) Step(ctx context.Context) bool {
 }
 
 // fixBoundaries zeroes the full-grid boundary interior cells in edge tiles.
-// ref.Solve fixes boundary rows/cols of the full grid; StepInto updates them,
-// so we restore them to 0 (Dirichlet BC) after each step.
+// Tile.StepInto updates all interior cells including those at the full-grid
+// boundary; ref.Solve leaves those cells fixed at 0 (Dirichlet BC).
 func (s *Sim) fixBoundaries() {
-	pw := s.pw
 	for i, row := range s.workers {
 		for j, w := range row {
 			t := w.CurrentTile()
-			tc := t.Cols + 2 // total columns including ghost cols
-
 			if i == 0 {
-				// Zero the first interior row (grid boundary row at the top).
 				for c := 0; c < t.Cols; c++ {
-					t.Data[1*tc+(c+1)] = 0
+					t.SetInteriorAt(0, c, 0)
 				}
 			}
-			if i == pw-1 {
-				// Zero the last interior row (grid boundary row at the bottom).
+			if i == s.pw-1 {
 				for c := 0; c < t.Cols; c++ {
-					t.Data[t.Rows*tc+(c+1)] = 0
+					t.SetInteriorAt(t.Rows-1, c, 0)
 				}
 			}
 			if j == 0 {
-				// Zero the first interior col (grid boundary col on the left).
 				for r := 0; r < t.Rows; r++ {
-					t.Data[(r+1)*tc+1] = 0
+					t.SetInteriorAt(r, 0, 0)
 				}
 			}
-			if j == pw-1 {
-				// Zero the last interior col (grid boundary col on the right).
+			if j == s.pw-1 {
 				for r := 0; r < t.Rows; r++ {
-					t.Data[(r+1)*tc+t.Cols] = 0
+					t.SetInteriorAt(r, t.Cols-1, 0)
 				}
 			}
 		}

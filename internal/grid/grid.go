@@ -41,6 +41,9 @@ func (t *Tile) set(r, c int, v float64) { t.Data[r*t.tc+c] = v }
 // InteriorAt returns the value at interior position (r, c), 0-indexed.
 func (t *Tile) InteriorAt(r, c int) float64 { return t.at(r+1, c+1) }
 
+// SetInteriorAt sets the value at interior position (r, c), 0-indexed.
+func (t *Tile) SetInteriorAt(r, c int, v float64) { t.set(r+1, c+1, v) }
+
 // NorthBoundary returns a copy of the topmost interior row (sent to north neighbor).
 func (t *Tile) NorthBoundary() []float64 {
 	row := make([]float64, t.Cols)
