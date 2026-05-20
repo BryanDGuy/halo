@@ -1,13 +1,12 @@
-// internal/worker/worker_test.go
 package worker_test
 
 import (
-	"context"
 	"sync"
 	"testing"
 
 	"github.com/BryanDGuy/halo/internal/grid"
 	"github.com/BryanDGuy/halo/internal/worker"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestWorkerRunOneStep(t *testing.T) {
@@ -20,8 +19,7 @@ func TestWorkerRunOneStep(t *testing.T) {
 
 	w := worker.New(tiles[0][0], 1.0, 0.1, 1.0)
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -30,9 +28,5 @@ func TestWorkerRunOneStep(t *testing.T) {
 	w.Start() <- struct{}{} // fire one step
 	wg.Wait()
 
-	got := w.CurrentTile().InteriorAt(1, 1) // center interior cell (0-indexed)
-	want := 0.6
-	if got < want-1e-12 || got > want+1e-12 {
-		t.Errorf("center after one step: want %v, got %v", want, got)
-	}
+	assert.InDelta(t, 0.6, w.CurrentTile().InteriorAt(1, 1), 1e-12)
 }

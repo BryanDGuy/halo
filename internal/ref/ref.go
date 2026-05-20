@@ -12,7 +12,7 @@ func Solve(g *grid.Grid, alpha, dt, h float64, n int) *grid.Grid {
 	copy(cur.Data, g.Data)
 	nxt := grid.New(rows, cols)
 	r := alpha * dt / (h * h)
-	for step := 0; step < n; step++ {
+	for range n {
 		for i := 1; i < rows-1; i++ {
 			for j := 1; j < cols-1; j++ {
 				c := cur.At(i, j)

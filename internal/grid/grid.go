@@ -3,8 +3,8 @@ package grid
 
 // Grid is an N×M grid of float64 values.
 type Grid struct {
-	Rows, Cols int
 	Data       []float64
+	Rows, Cols int
 }
 
 func New(rows, cols int) *Grid {
@@ -19,9 +19,9 @@ func (g *Grid) Set(r, c int, v float64) { g.Data[r*g.Cols+c] = v }
 // col 0 and col Cols+1 are west/east ghost columns. Boundary ghosts default to 0
 // (Dirichlet BC).
 type Tile struct {
+	Data               []float64
 	RowStart, ColStart int
 	Rows, Cols         int
-	Data               []float64
 	tc                 int // total cols = Cols+2
 }
 
@@ -47,7 +47,7 @@ func (t *Tile) SetInteriorAt(r, c int, v float64) { t.set(r+1, c+1, v) }
 // NorthBoundary returns a copy of the topmost interior row (sent to north neighbor).
 func (t *Tile) NorthBoundary() []float64 {
 	row := make([]float64, t.Cols)
-	for c := 0; c < t.Cols; c++ {
+	for c := range t.Cols {
 		row[c] = t.at(1, c+1)
 	}
 	return row
@@ -56,7 +56,7 @@ func (t *Tile) NorthBoundary() []float64 {
 // SouthBoundary returns a copy of the bottommost interior row (sent to south neighbor).
 func (t *Tile) SouthBoundary() []float64 {
 	row := make([]float64, t.Cols)
-	for c := 0; c < t.Cols; c++ {
+	for c := range t.Cols {
 		row[c] = t.at(t.Rows, c+1)
 	}
 	return row
@@ -65,7 +65,7 @@ func (t *Tile) SouthBoundary() []float64 {
 // WestBoundary returns a copy of the leftmost interior column (sent to west neighbor).
 func (t *Tile) WestBoundary() []float64 {
 	col := make([]float64, t.Rows)
-	for r := 0; r < t.Rows; r++ {
+	for r := range t.Rows {
 		col[r] = t.at(r+1, 1)
 	}
 	return col
@@ -74,7 +74,7 @@ func (t *Tile) WestBoundary() []float64 {
 // EastBoundary returns a copy of the rightmost interior column (sent to east neighbor).
 func (t *Tile) EastBoundary() []float64 {
 	col := make([]float64, t.Rows)
-	for r := 0; r < t.Rows; r++ {
+	for r := range t.Rows {
 		col[r] = t.at(r+1, t.Cols)
 	}
 	return col
@@ -132,8 +132,8 @@ func Decompose(g *Grid, pw int) [][]*Tile {
 		colStart := 0
 		for j := range tiles[i] {
 			t := NewTile(rowStart, colStart, rowH[i], colW[j])
-			for r := 0; r < rowH[i]; r++ {
-				for c := 0; c < colW[j]; c++ {
+			for r := range rowH[i] {
+				for c := range colW[j] {
 					t.set(r+1, c+1, g.At(rowStart+r, colStart+c))
 				}
 			}
@@ -147,8 +147,8 @@ func Decompose(g *Grid, pw int) [][]*Tile {
 
 // CollectTile copies the interior of t back into g.
 func CollectTile(t *Tile, g *Grid) {
-	for r := 0; r < t.Rows; r++ {
-		for c := 0; c < t.Cols; c++ {
+	for r := range t.Rows {
+		for c := range t.Cols {
 			g.Set(t.RowStart+r, t.ColStart+c, t.at(r+1, c+1))
 		}
 	}

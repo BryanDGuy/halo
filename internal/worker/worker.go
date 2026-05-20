@@ -13,12 +13,12 @@ import (
 // skipped during exchange, leaving ghost cells at their initial value of 0 (Dirichlet BC).
 type Worker struct {
 	cur, nxt     *grid.Tile
-	alpha, dt, h float64
 	startCh      chan struct{}
 	sendN, sendS chan<- []float64
 	sendE, sendW chan<- []float64
 	recvN, recvS <-chan []float64
 	recvE, recvW <-chan []float64
+	alpha, dt, h float64
 }
 
 func New(tile *grid.Tile, alpha, dt, h float64) *Worker {

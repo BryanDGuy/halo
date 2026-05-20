@@ -30,8 +30,8 @@ func New(tiles [][]*grid.Tile, alpha, dt, h float64) *Sim {
 	}
 
 	// Wire vertical channels between row i (top) and row i+1 (bottom).
-	for i := 0; i < pw-1; i++ {
-		for j := 0; j < pw; j++ {
+	for i := range pw - 1 {
+		for j := range pw {
 			southward := make(chan []float64, 1) // top sends south boundary downward
 			northward := make(chan []float64, 1) // bottom sends north boundary upward
 			workers[i][j].SetSendS(southward)
@@ -42,8 +42,8 @@ func New(tiles [][]*grid.Tile, alpha, dt, h float64) *Sim {
 	}
 
 	// Wire horizontal channels between col j (left) and col j+1 (right).
-	for i := 0; i < pw; i++ {
-		for j := 0; j < pw-1; j++ {
+	for i := range pw {
+		for j := range pw - 1 {
 			eastward := make(chan []float64, 1) // left sends east boundary rightward
 			westward := make(chan []float64, 1) // right sends west boundary leftward
 			workers[i][j].SetSendE(eastward)
@@ -65,7 +65,7 @@ func (s *Sim) Start(ctx context.Context) {
 	}
 }
 
-// Step runs one timestep. It returns false if ctx is already cancelled.
+// Step runs one timestep. It returns false if ctx is already canceled.
 func (s *Sim) Step(ctx context.Context) bool {
 	if ctx.Err() != nil {
 		return false
@@ -91,22 +91,22 @@ func (s *Sim) fixBoundaries() {
 		for j, w := range row {
 			t := w.CurrentTile()
 			if i == 0 {
-				for c := 0; c < t.Cols; c++ {
+				for c := range t.Cols {
 					t.SetInteriorAt(0, c, 0)
 				}
 			}
 			if i == s.pw-1 {
-				for c := 0; c < t.Cols; c++ {
+				for c := range t.Cols {
 					t.SetInteriorAt(t.Rows-1, c, 0)
 				}
 			}
 			if j == 0 {
-				for r := 0; r < t.Rows; r++ {
+				for r := range t.Rows {
 					t.SetInteriorAt(r, 0, 0)
 				}
 			}
 			if j == s.pw-1 {
-				for r := 0; r < t.Rows; r++ {
+				for r := range t.Rows {
 					t.SetInteriorAt(r, t.Cols-1, 0)
 				}
 			}
