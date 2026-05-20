@@ -36,23 +36,23 @@ make build
 ./bin/halo
 ```
 
-Press `Ctrl+C` to exit.
+Press `Ctrl+C` to exit. The grid auto-sizes to your terminal — characters are ~2×
+taller than wide, so rows is set to half the column count to keep the simulation
+visually square.
 
 **Options:**
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `-rows` | 64 | Grid height |
-| `-cols` | 64 | Grid width |
 | `-workers` | 2 | Worker grid dimension (NxN) |
 | `-alpha` | 0.1 | Thermal diffusivity |
 | `-dt` | auto | Timestep (0 = auto-compute stable value) |
 | `-steps` | 0 | Steps to run (0 = run until Ctrl+C) |
 
-Example — larger grid with a 4×4 worker pool:
+Example — 4×4 worker pool:
 
 ```
-./bin/halo -rows 80 -cols 80 -workers 4
+./bin/halo -workers 4
 ```
 
 ## Development
@@ -71,7 +71,7 @@ make update-deps # bump all dependencies
 ## Architecture
 
 ```
-main.go          orchestrates flags, signal handling, render loop
+main.go          signal handling, auto-sized grid, render loop
 internal/
   grid/          Grid and Tile types; Decompose, CollectTile, StepInto
   worker/        per-tile goroutine; halo exchange via buffered channels

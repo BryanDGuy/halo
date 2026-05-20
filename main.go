@@ -21,15 +21,18 @@ const framePeriod = time.Second / 30
 func main() {
 	termCols, termRows := termSize()
 
-	rows := flag.Int("rows", termRows-1, "grid height")
-	cols := flag.Int("cols", termCols, "grid width")
+	// Terminal characters are ~2× taller than wide, so half as many rows
+	// fills the same physical area, keeping the grid visually square.
+	rows := min(termRows-1, termCols/2)
+	cols := termCols
+
 	workers := flag.Int("workers", 2, "worker grid dimension (NxN)")
 	alpha := flag.Float64("alpha", 0.1, "thermal diffusivity")
 	dt := flag.Float64("dt", 0, "timestep (0 = auto)")
 	steps := flag.Int("steps", 0, "steps to run (0 = run until Ctrl+C)")
 	flag.Parse()
 
-	h := 1.0 / float64(max(*rows, *cols))
+	h := 1.0 / float64(max(rows, cols))
 	if *dt == 0 {
 		*dt = 0.24 * h * h / *alpha
 	}
@@ -37,8 +40,8 @@ func main() {
 		fmt.Fprintln(os.Stderr, "warning: unstable timestep (α·Δt/h² > 0.25) — reduce -dt or -alpha")
 	}
 
-	g := grid.New(*rows, *cols)
-	g.Set(*rows/2, *cols/2, 1.0)
+	g := grid.New(rows, cols)
+	g.Set(rows/2, cols/2, 1.0)
 
 	tiles := grid.Decompose(g, *workers)
 	s := sim.New(tiles, *alpha, *dt, h)
@@ -58,7 +61,7 @@ func main() {
 
 	s.Start(ctx)
 
-	display := grid.New(*rows, *cols)
+	display := grid.New(rows, cols)
 	step := 0
 	for *steps == 0 || step < *steps {
 		start := time.Now()
