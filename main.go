@@ -26,9 +26,8 @@ func main() {
 	if *dt == 0 {
 		*dt = 0.24 * h * h / *alpha
 	}
-	if *alpha**dt/(h*h) > 0.25 {
-		fmt.Fprintf(os.Stderr, "warning: unstable timestep (α·Δt/h²=%.4f > 0.25)\n",
-			*alpha**dt/(h*h))
+	if r := *alpha * *dt / (h * h); r > 0.25 {
+		fmt.Fprintf(os.Stderr, "warning: unstable timestep (α·Δt/h²=%.4f > 0.25)\n", r)
 	}
 
 	g := grid.New(*rows, *cols)
